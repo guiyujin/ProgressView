@@ -66,7 +66,7 @@ public class ProgressView extends View {
     private String text;
     private Rect textBounds;
     private int bottom_height;
-    private int duration;
+    private int duration = 1000;
 
     public int getProgressOuterColor() {
         return progressOuterColor;
@@ -343,20 +343,21 @@ public class ProgressView extends View {
     public void start() {
         checkType();
         ValueAnimator valueAnimator = ObjectAnimator.ofFloat(progressStart, progressEnd);
-        duration = 2000;
+
         valueAnimator.setDuration(duration);
         valueAnimator.setInterpolator(new DecelerateInterpolator());
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float animatedValue = (float) animation.getAnimatedValue();
-                if (animatedValue == progressMax && !isComplete) {
+                if (animatedValue >= progressMax && !isComplete) {
                     isComplete = true;
                     onCompleteListener.onComplete();
                     progressAddPaint.setColor(getProgressOuterColor());
                     invalidate();
+                }else {
+                    setProgressCurrent((int) animatedValue);
                 }
-                setProgressCurrent((int) animatedValue);
             }
         });
         valueAnimator.start();

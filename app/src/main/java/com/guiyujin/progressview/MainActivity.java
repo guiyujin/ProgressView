@@ -25,7 +25,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "click"
                         , Toast.LENGTH_SHORT).show();
-                progressView.setProgressEnd(progressView.getProgressEnd() + 10);
+                if (progressView.getProgressEnd() <= 90){
+                    progressView.setProgressEnd(progressView.getProgressEnd() + 10);
+                }
                 progressView.start();
             }
         });
