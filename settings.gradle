@@ -1,0 +1,3 @@
+rootProject.name = "ProcessView"
+include ':app'
+include ':processview'
