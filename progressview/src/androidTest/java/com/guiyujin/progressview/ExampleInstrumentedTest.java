@@ -1,4 +1,4 @@
-package com.guiyujin.processview;
+package com.guiyujin.progressview;
 
 import android.content.Context;
 

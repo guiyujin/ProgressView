@@ -1,10 +1,11 @@
-package com.guiyujin.processview;
+package com.guiyujin.progressview;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -22,23 +23,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public class ProcessView extends View {
+public class ProgressView extends View {
     private Context context;
 
-    //外弧颜色
+    // 未完成进度条颜色
     private int progressOuterColor;
-    //内弧颜色
+    // 已完成进度条颜色
     private int progressInnerColor;
-    //圆弧宽度
+    // 圆弧宽度
     private int progressBorderWidth = 10;
-    //字体颜色
+    // 字体颜色
     private int progressTextColor;
-    //字体大小
+    // 字体大小
     private int progressTextSize = 20;
-
+    // 加号颜色
     private int processAddColor;
 
-    private Paint progressOuterPaint, progressInnerPaint, processAddPaint, progressTextPaint;
+    private Paint progressOuterPaint, progressInnerPaint, progressAddPaint, progressTextPaint;
 
     //最大进度
     private int progressMax = 100;
@@ -48,7 +49,7 @@ public class ProcessView extends View {
     // 起始进度
     private int progressStart = 0;
 
-    private int processEnd = 0;
+    private int progressEnd = 0;
 
     private int circleHeight;
 
@@ -56,7 +57,7 @@ public class ProcessView extends View {
 
     private onCompleteListener onCompleteListener;
 
-    @ProcessType
+    @ProgressType
     private int type = AUTO_INCREASE;
     public static final int AUTO_INCREASE = 0;
     public static final int MANUAL_INCREASE = 1;
@@ -127,13 +128,13 @@ public class ProcessView extends View {
         return progressStart;
     }
 
-    public int getProcessEnd() {
-        return processEnd;
+    public int getProgressEnd() {
+        return progressEnd;
     }
 
-    public void setProcessEnd(int processEnd) {
-        setProgressStart(this.processEnd);
-        this.processEnd = processEnd;
+    public void setProgressEnd(int progressEnd) {
+        setProgressStart(this.progressEnd);
+        this.progressEnd = progressEnd;
     }
 
     public int getCircleHeight() {
@@ -144,11 +145,11 @@ public class ProcessView extends View {
         this.circleHeight = circleHeight;
     }
 
-    public ProcessView.onCompleteListener getOnCompleteListener() {
+    public ProgressView.onCompleteListener getOnCompleteListener() {
         return onCompleteListener;
     }
 
-    public void setOnCompleteListener(ProcessView.onCompleteListener onCompleteListener) {
+    public void setOnCompleteListener(ProgressView.onCompleteListener onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
     }
 
@@ -156,7 +157,7 @@ public class ProcessView extends View {
         return type;
     }
 
-    public void setType(@ProcessType int type) {
+    public void setType(@ProgressType int type) {
         this.type = type;
     }
 
@@ -168,15 +169,15 @@ public class ProcessView extends View {
         this.duration = duration;
     }
 
-    public ProcessView(Context context) {
+    public ProgressView(Context context) {
         this(context, null);
     }
 
-    public ProcessView(Context context, @Nullable AttributeSet attrs) {
+    public ProgressView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ProcessView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ProgressView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
 
@@ -184,10 +185,10 @@ public class ProcessView extends View {
     }
 
     private void init(Context context, AttributeSet attrs) {
-        progressOuterColor = ContextCompat.getColor(context, R.color.processOut);
-        progressInnerColor = ContextCompat.getColor(context, R.color.processIn);
-        progressTextColor = ContextCompat.getColor(context, R.color.processIn);
-        processAddColor = ContextCompat.getColor(context, R.color.processIn);
+        progressOuterColor = Color.parseColor("#EBEBEB");
+        progressInnerColor = Color.parseColor("#99CCFF");;
+        progressTextColor = Color.parseColor("#99CCFF");
+        processAddColor = Color.parseColor("#99CCFF");
 
         //获取自定义属性
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ProgressView);
@@ -213,11 +214,11 @@ public class ProcessView extends View {
         progressInnerPaint.setStyle(Paint.Style.STROKE);
         progressInnerPaint.setStrokeCap(Paint.Cap.ROUND);
 
-        processAddPaint = new Paint();
-        processAddPaint.setAntiAlias(true);
-        processAddPaint.setStrokeWidth(progressBorderWidth);
-        processAddPaint.setStrokeCap(Paint.Cap.ROUND);
-        processAddPaint.setColor(processAddColor);
+        progressAddPaint = new Paint();
+        progressAddPaint.setAntiAlias(true);
+        progressAddPaint.setStrokeWidth(progressBorderWidth);
+        progressAddPaint.setStrokeCap(Paint.Cap.ROUND);
+        progressAddPaint.setColor(processAddColor);
 
         progressTextPaint = new Paint();
         progressTextPaint.setAntiAlias(true);
@@ -307,10 +308,10 @@ public class ProcessView extends View {
         int dx = circleHeight / 2;
         int dy = circleHeight / 2;
         int addWidth = 20;
-        canvas.drawLine(dx, dy, dx - addWidth, dy, processAddPaint);
-        canvas.drawLine(dx, dy, dx + addWidth, dy, processAddPaint);
-        canvas.drawLine(dx, dy, dx, dy - addWidth, processAddPaint);
-        canvas.drawLine(dx, dy, dx, dy + addWidth, processAddPaint);
+        canvas.drawLine(dx, dy, dx - addWidth, dy, progressAddPaint);
+        canvas.drawLine(dx, dy, dx + addWidth, dy, progressAddPaint);
+        canvas.drawLine(dx, dy, dx, dy - addWidth, progressAddPaint);
+        canvas.drawLine(dx, dy, dx, dy + addWidth, progressAddPaint);
     }
 
     public synchronized void setProgressMax(int max) {
@@ -341,7 +342,7 @@ public class ProcessView extends View {
 
     public void start() {
         checkType();
-        ValueAnimator valueAnimator = ObjectAnimator.ofFloat(progressStart, processEnd);
+        ValueAnimator valueAnimator = ObjectAnimator.ofFloat(progressStart, progressEnd);
         duration = 2000;
         valueAnimator.setDuration(duration);
         valueAnimator.setInterpolator(new DecelerateInterpolator());
@@ -352,7 +353,7 @@ public class ProcessView extends View {
                 if (animatedValue == progressMax && !isComplete) {
                     isComplete = true;
                     onCompleteListener.onComplete();
-                    processAddPaint.setColor(getProgressOuterColor());
+                    progressAddPaint.setColor(getProgressOuterColor());
                     invalidate();
                 }
                 setProgressCurrent((int) animatedValue);
@@ -364,7 +365,7 @@ public class ProcessView extends View {
     @IntDef({AUTO_INCREASE, MANUAL_INCREASE})
     @Target({ElementType.FIELD, ElementType.PARAMETER})
     @Retention(RetentionPolicy.SOURCE)
-    @interface ProcessType {
+    @interface ProgressType {
     }
 
 

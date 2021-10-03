@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.guiyujin.processview.ProcessView
+    <com.guiyujin.progressview.ProgressView
         android:id="@+id/process"
         android:layout_width="45dp"
         android:layout_height="45dp"
